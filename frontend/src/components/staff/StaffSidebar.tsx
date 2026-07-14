@@ -2,9 +2,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   History,
-  BarChart3,
   Package,
-  Users,
+  Bell,
   RotateCcw,
   LogOut,
   ChevronsLeft,
@@ -12,13 +11,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import StaffProfileLink from "./StaffProfileLink";
 
 const navItems: { name: string; icon: LucideIcon; path: string }[] = [
   { name: "POS (New Sale)", icon: ShoppingCart, path: "/staff/pos" },
   { name: "Sales History", icon: History, path: "/staff/sales" },
-  { name: "My Performance", icon: BarChart3, path: "/staff/performance" },
   { name: "Products", icon: Package, path: "/staff/products" },
-  { name: "Customers", icon: Users, path: "/staff/customers" },
+  { name: "Notifications", icon: Bell, path: "/staff/notifications" },
   { name: "Returns (Request)", icon: RotateCcw, path: "/staff/returns" },
 ];
 
@@ -104,7 +103,10 @@ export default function StaffSidebar({
       </nav>
 
       <div className="border-t border-slate-700/50 p-3">
-        <div className="mb-2 flex items-center gap-3 rounded-xl bg-sidebar-hover/50 p-2.5">
+        <StaffProfileLink
+          onClick={onNavClick}
+          className="mb-2 flex w-full items-center gap-3 rounded-xl bg-sidebar-hover/50 p-2.5 text-left"
+        >
           <img
             src={user?.avatar}
             alt={user?.name}
@@ -121,7 +123,7 @@ export default function StaffSidebar({
               </div>
             </div>
           )}
-        </div>
+        </StaffProfileLink>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] text-slate-400 transition hover:bg-sidebar-hover hover:text-white"

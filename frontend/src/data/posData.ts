@@ -124,7 +124,16 @@ export const products: Product[] = [
   },
 ];
 
-export const recentTransactions = [
+export interface RecentTransaction {
+  invoice: string;
+  customer: string;
+  items: string;
+  total: string;
+  time: string;
+  status: string;
+}
+
+export const recentTransactions: RecentTransaction[] = [
   {
     invoice: "INV-20260712-005",
     customer: "Abebe Kebede",

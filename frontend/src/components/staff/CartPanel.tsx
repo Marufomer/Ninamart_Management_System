@@ -15,18 +15,37 @@ import {
   TAX_RATE,
   formatCurrency,
 } from "../../data/posData";
+import {
+  buildInvoiceFromCart,
+  printInvoice,
+} from "../../utils/printInvoice";
 
 type PaymentMethod = "cash" | "card" | "mobile" | "bank";
+
+const PAYMENT_LABELS: Record<PaymentMethod, string> = {
+  cash: "Cash",
+  card: "Card",
+  mobile: "Mobile Money",
+  bank: "Bank Transfer",
+};
 
 interface CartPanelProps {
   cart: CartItem[];
   paymentMethod: PaymentMethod;
   amountReceived: number;
+  customerName: string;
+  customerPhone: string;
+  staffName: string;
   onPaymentMethodChange: (m: PaymentMethod) => void;
   onAmountReceivedChange: (amount: number) => void;
+  onCustomerNameChange: (name: string) => void;
+  onCustomerPhoneChange: (phone: string) => void;
   onUpdateQty: (id: string, qty: number) => void;
   onRemove: (id: string) => void;
   onClearAll: () => void;
+  onCompleteSale: () => void;
+  onHoldSale: () => void;
+  heldSalesCount?: number;
   embedded?: boolean;
 }
 
@@ -41,11 +60,19 @@ export default function CartPanel({
   cart,
   paymentMethod,
   amountReceived,
+  customerName,
+  customerPhone,
+  staffName,
   onPaymentMethodChange,
   onAmountReceivedChange,
+  onCustomerNameChange,
+  onCustomerPhoneChange,
   onUpdateQty,
   onRemove,
   onClearAll,
+  onCompleteSale,
+  onHoldSale,
+  heldSalesCount = 0,
   embedded = false,
 }: CartPanelProps) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -53,6 +80,22 @@ export default function CartPanel({
   const tax = subtotal * TAX_RATE;
   const total = subtotal - discount + tax;
   const change = Math.max(0, amountReceived - total);
+  const canComplete = cart.length > 0 && (paymentMethod !== "cash" || amountReceived >= total);
+
+  const handlePrintInvoice = () => {
+    if (cart.length === 0) return;
+    printInvoice(
+      buildInvoiceFromCart({
+        cart,
+        customerName,
+        customerPhone,
+        staff: staffName,
+        paymentMethod: PAYMENT_LABELS[paymentMethod],
+        amountReceived,
+        discount,
+      })
+    );
+  };
 
   return (
     <div
@@ -151,6 +194,34 @@ export default function CartPanel({
       </div>
 
       <div className="border-t border-slate-100 px-4 py-3">
+        <div className="mb-3 space-y-2">
+          <p className="text-[11px] font-semibold text-slate-600">Customer</p>
+          <div>
+            <label className="mb-1 block text-[11px] font-medium text-slate-600">
+              Customer Name
+            </label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => onCustomerNameChange(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+              placeholder="Enter customer name"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-[11px] font-medium text-slate-600">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={customerPhone}
+              onChange={(e) => onCustomerPhoneChange(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+              placeholder="09XX XXX XXXX"
+            />
+          </div>
+        </div>
+
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between text-slate-600">
             <span>Subtotal ({cart.reduce((s, i) => s + i.quantity, 0)} items)</span>
@@ -220,16 +291,33 @@ export default function CartPanel({
           </div>
         </div>
 
-        <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-110 active:scale-[0.98]">
+        <button
+          onClick={onCompleteSale}
+          disabled={!canComplete}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
           <CheckCircle2 className="h-4 w-4" />
           Complete Sale
         </button>
         <div className="mt-2 grid grid-cols-2 gap-2">
-          <button className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">
+          <button
+            onClick={onHoldSale}
+            disabled={cart.length === 0}
+            className="relative flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
             <Pause className="h-3.5 w-3.5" />
             Hold Sale
+            {heldSalesCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white">
+                {heldSalesCount}
+              </span>
+            )}
           </button>
-          <button className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">
+          <button
+            onClick={handlePrintInvoice}
+            disabled={cart.length === 0}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
             <Printer className="h-3.5 w-3.5" />
             Print Invoice
           </button>

@@ -42,3 +42,56 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+@keyframes nina-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
+  }
+}
+
+@keyframes nina-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.08);
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.08);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes nina-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.nina-logo-pulse {
+  animation: nina-pulse 1.2s ease-in-out infinite;
+}
+
+.nina-logo-spin {
+  animation: nina-spin 1.4s ease-in-out infinite;
+}
+
+.nina-logo-ring {
+  animation: nina-ring 1.4s ease-out infinite;
+}

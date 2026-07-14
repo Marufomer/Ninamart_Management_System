@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import NinaLogo from "../components/staff/NinaLogo";
 import loginHero from "../assets/login-hero.png";
 
 function GoogleIcon() {
@@ -36,6 +37,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -43,18 +45,30 @@ export default function Login() {
     setLoading(true);
 
     const result = login(email, password);
-    setLoading(false);
 
     if (!result.success) {
+      setLoading(false);
       setError(result.error ?? "Login failed");
       return;
     }
 
-    navigate(result.user?.role === "admin" ? "/dashboard" : "/staff/pos");
+    setRedirecting(true);
+    setTimeout(() => {
+      navigate(result.user?.role === "admin" ? "/dashboard" : "/staff/pos");
+    }, 900);
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#eef0f8] p-4 sm:p-6">
+      {redirecting && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/95 backdrop-blur-sm">
+          <NinaLogo size="lg" animated variant="pulse" />
+          <div className="text-center">
+            <p className="text-sm font-semibold text-slate-800">Welcome back!</p>
+            <p className="mt-1 text-xs text-slate-400">Opening your dashboard...</p>
+          </div>
+        </div>
+      )}
       <div className="flex w-full max-w-[1080px] overflow-hidden rounded-[28px] bg-white shadow-[0_8px_60px_rgba(99,102,241,0.12)]">
         {/* Left Panel — Branding + Hero Image */}
         <div className="relative hidden w-[50%] flex-col overflow-hidden lg:flex">

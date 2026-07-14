@@ -1,23 +1,30 @@
-import { recentTransactions } from "../../data/posData";
+import { Link } from "react-router-dom";
+import { recentTransactions as defaultTransactions, type RecentTransaction } from "../../data/posData";
 
-export default function RecentTransactions() {
+interface RecentTransactionsProps {
+  transactions?: RecentTransaction[];
+}
+
+export default function RecentTransactions({
+  transactions = defaultTransactions,
+}: RecentTransactionsProps) {
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-slate-800">
           Recent Transactions
         </h3>
-        <a
-          href="#"
+        <Link
+          to="/staff/sales"
           className="shrink-0 text-xs font-medium text-indigo-600 hover:underline"
         >
           View All Sales
-        </a>
+        </Link>
       </div>
 
       {/* Mobile card layout */}
       <div className="space-y-2.5 md:hidden">
-        {recentTransactions.map((tx) => (
+        {transactions.map((tx) => (
           <div
             key={tx.invoice}
             className="rounded-lg border border-slate-100 p-3"
@@ -58,7 +65,7 @@ export default function RecentTransactions() {
             </tr>
           </thead>
           <tbody>
-            {recentTransactions.map((tx) => (
+            {transactions.map((tx) => (
               <tr
                 key={tx.invoice}
                 className="border-b border-slate-50 hover:bg-slate-50/50"

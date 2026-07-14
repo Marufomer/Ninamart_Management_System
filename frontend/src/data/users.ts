@@ -43,3 +43,44 @@ export function authenticate(
   );
   return user ?? null;
 }
+
+const PASSWORD_OVERRIDES_KEY = "ninamart_password_overrides";
+
+export function getStoredPassword(userId: string, fallback: string): string {
+  try {
+    const stored = localStorage.getItem(PASSWORD_OVERRIDES_KEY);
+    if (!stored) return fallback;
+    const overrides = JSON.parse(stored) as Record<string, string>;
+    return overrides[userId] ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function setStoredPassword(userId: string, password: string): void {
+  try {
+    const stored = localStorage.getItem(PASSWORD_OVERRIDES_KEY);
+    const overrides = stored
+      ? (JSON.parse(stored) as Record<string, string>)
+      : {};
+    overrides[userId] = password;
+    localStorage.setItem(PASSWORD_OVERRIDES_KEY, JSON.stringify(overrides));
+  } catch {
+    /* ignore storage errors */
+  }
+}
+
+export function verifyPassword(userId: string, password: string): boolean {
+  const user = users.find((u) => u.id === userId);
+  if (!user) return false;
+  const currentPassword = getStoredPassword(userId, user.password);
+  return currentPassword === password;
+}
+
+export function findUserByEmail(email: string, excludeId?: string): boolean {
+  return users.some(
+    (u) =>
+      u.email.toLowerCase() === email.toLowerCase() &&
+      u.id !== excludeId
+  );
+}
