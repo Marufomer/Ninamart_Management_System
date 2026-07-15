@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import AdminPageShell from "../../components/admin/AdminPageShell";
 import { categories } from "../../data/posData";
 import { adminRoutes } from "../../data/adminRoutes";
+import { broadcastStaffNotif } from "../../utils/notificationStorage";
 
 export default function AdminAddProduct() {
   const navigate = useNavigate();
@@ -12,12 +13,23 @@ export default function AdminAddProduct() {
   const [category, setCategory] = useState(categories[1] ?? "Phones");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [color, setColor] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("Product added successfully! (Demo — not persisted)");
-    setTimeout(() => navigate(adminRoutes.products.path), 1500);
+
+    const stockQty = parseInt(stock, 10) || 0;
+
+    // Notify all staff about the new product
+    broadcastStaffNotif({
+      type: "stock",
+      title: `New product added: ${name.trim()}`,
+      message: `${name.trim()} (${category}) has been added to the catalog with ${stockQty} unit${stockQty !== 1 ? "s" : ""} in stock. SKU: ${sku.trim()}`,
+    });
+
+    setMessage(`✓ "${name.trim()}" added successfully! Staff have been notified.`);
+    setTimeout(() => navigate(adminRoutes.products.path), 1800);
   };
 
   return (
@@ -42,7 +54,7 @@ export default function AdminAddProduct() {
         <div className="space-y-4">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              Product Name
+              Product Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -53,9 +65,12 @@ export default function AdminAddProduct() {
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
             />
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">SKU</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                SKU <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 value={sku}
@@ -82,10 +97,11 @@ export default function AdminAddProduct() {
               </select>
             </div>
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Price (Br)
+                Price (Br) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -99,7 +115,7 @@ export default function AdminAddProduct() {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                Initial Stock
+                Initial Stock <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -112,10 +128,25 @@ export default function AdminAddProduct() {
               />
             </div>
           </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              Color / Variant <span className="text-slate-400">(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              placeholder="e.g. Midnight Black, Space Gray"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+            />
+          </div>
         </div>
 
         {message && (
-          <p className="mt-4 text-sm text-emerald-600">{message}</p>
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+            <p className="text-sm font-medium text-emerald-700">{message}</p>
+          </div>
         )}
 
         <div className="mt-6 flex gap-3">

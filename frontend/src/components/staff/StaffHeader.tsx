@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, Search, Bell, Calendar, ScanLine, ShoppingCart } from "lucide-react";
+import { Menu, Search, Bell, Calendar, ScanLine, ShoppingCart, MessageSquare } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import StaffProfileLink from "./StaffProfileLink";
+import { getUnreadCount } from "../../utils/messageStorage";
+import { getStaffUnreadCount } from "../../utils/notificationStorage";
 
 interface StaffHeaderProps {
   onMenuClick: () => void;
@@ -32,6 +34,8 @@ export default function StaffHeader({
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dateTime, setDateTime] = useState("");
+  const unreadMessages = getUnreadCount("staff", user?.id);
+  const unreadNotifications = getStaffUnreadCount(user?.id ?? "");
 
   useEffect(() => {
     const update = () => {
@@ -108,9 +112,24 @@ export default function StaffHeader({
             aria-label="View notifications"
           >
             <Bell className="h-[18px] w-[18px]" />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">
-              3
-            </span>
+            {unreadNotifications > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">
+                {unreadNotifications > 9 ? "9+" : unreadNotifications}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => navigate("/staff/messages")}
+            className="relative rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
+            aria-label="View messages"
+          >
+            <MessageSquare className="h-[18px] w-[18px]" />
+            {unreadMessages > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">
+                {unreadMessages}
+              </span>
+            )}
           </button>
 
           <div className="hidden items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 xl:flex">

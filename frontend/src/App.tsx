@@ -12,6 +12,7 @@ import StaffProducts from "./pages/staff/StaffProducts";
 import StaffNotifications from "./pages/staff/StaffNotifications";
 import StaffReturns from "./pages/staff/StaffReturns";
 import StaffProfile from "./pages/staff/StaffProfile";
+import StaffMessages from "./pages/staff/StaffMessages";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminAddProduct from "./pages/admin/AdminAddProduct";
 import AdminInventory from "./pages/admin/AdminInventory";
@@ -97,6 +98,7 @@ function App() {
             <Route path="products" element={<StaffProducts />} />
             <Route path="notifications" element={<StaffNotifications />} />
             <Route path="returns" element={<StaffReturns />} />
+            <Route path="messages" element={<StaffMessages />} />
             <Route path="profile" element={<StaffProfile />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

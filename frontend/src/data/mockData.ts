@@ -175,6 +175,7 @@ export const navGroups = [
       { name: "Activity Logs", icon: "activity", path: "/dashboard/activity-logs" },
       { name: "Backup", icon: "database", path: "/dashboard/backup" },
       { name: "Notifications", icon: "bell", path: "/dashboard/notifications" },
+      { name: "Messages", icon: "messageSquare", path: "/dashboard/messages" },
     ],
   },
 ];

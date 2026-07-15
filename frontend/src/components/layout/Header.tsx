@@ -16,7 +16,8 @@ import {
   getAdminRouteTitle,
   getAdminRouteTitleShort,
 } from "../../data/adminRoutes";
-import { adminNotifications } from "../../data/adminNotificationsData";
+import { getUnreadCount } from "../../utils/messageStorage";
+import { getAdminUnreadCount } from "../../utils/notificationStorage";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -34,8 +35,8 @@ export default function Header({ onMenuClick, mobileOpen }: HeaderProps) {
 
   const title = getAdminRouteTitle(location.pathname);
   const titleShort = getAdminRouteTitleShort(location.pathname);
-  const unreadNotifications = adminNotifications.filter((n) => !n.read).length;
-  const unreadMessages = 3;
+  const unreadNotifications = getAdminUnreadCount();
+  const unreadMessages = getUnreadCount("admin");
 
   useEffect(() => {
     const update = () => {
@@ -135,7 +136,7 @@ export default function Header({ onMenuClick, mobileOpen }: HeaderProps) {
 
           <button
             onClick={() => navigate("/dashboard/messages")}
-            className="relative hidden rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 sm:block"
+            className="relative rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
             aria-label="View messages"
           >
             <MessageSquare className="h-5 w-5" />

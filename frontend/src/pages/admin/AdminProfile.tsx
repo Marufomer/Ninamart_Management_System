@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { Camera, Lock, Mail, Save, User } from "lucide-react";
+import { Camera, Lock, Mail, Save, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AdminPageShell from "../../components/admin/AdminPageShell";
 import { useAuth } from "../../context/AuthContext";
 import { adminRoutes } from "../../data/adminRoutes";
 
 export default function AdminProfile() {
-  const { user, updateProfile, changePassword } = useAuth();
+  const { user, updateProfile, changePassword, logout } = useAuth();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(user?.name ?? "");
@@ -74,6 +76,11 @@ export default function AdminProfile() {
     setNewPassword("");
     setConfirmPassword("");
     setPasswordMessage("Password changed successfully");
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -229,6 +236,21 @@ export default function AdminProfile() {
             Update Password
           </button>
         </form>
+
+        <div className="rounded-2xl border border-red-100 bg-red-50/30 p-4 shadow-sm sm:p-6">
+          <h3 className="mb-2 text-base font-semibold text-red-800">Sign Out</h3>
+          <p className="text-xs text-slate-500 mb-4">
+            Sign out of your account on this device. You will need to enter your credentials to log back in.
+          </p>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-red-700"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
+        </div>
       </div>
     </AdminPageShell>
   );

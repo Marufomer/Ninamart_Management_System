@@ -18,6 +18,7 @@ import {
   Activity,
   Database,
   Bell,
+  MessageSquare,
   ChevronDown,
   ChevronsLeft,
   X,
@@ -48,6 +49,7 @@ const iconMap: Record<string, LucideIcon> = {
   activity: Activity,
   database: Database,
   bell: Bell,
+  messageSquare: MessageSquare,
 };
 
 interface SidebarProps {
@@ -83,7 +85,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col bg-sidebar transition-transform duration-300 ease-in-out ${
+      className={`fixed left-0 top-0 z-50 flex h-dvh flex-col bg-sidebar transition-transform duration-300 ease-in-out ${
         isMobile
           ? `w-[280px] max-w-[85vw] ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`
           : `${collapsed ? "w-[72px]" : "w-[260px]"} translate-x-0`

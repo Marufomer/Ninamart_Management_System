@@ -5,6 +5,7 @@ import {
   Package,
   Bell,
   RotateCcw,
+  MessageSquare,
   LogOut,
   ChevronsLeft,
   X,
@@ -19,6 +20,7 @@ const navItems: { name: string; icon: LucideIcon; path: string }[] = [
   { name: "Products", icon: Package, path: "/staff/products" },
   { name: "Notifications", icon: Bell, path: "/staff/notifications" },
   { name: "Returns (Request)", icon: RotateCcw, path: "/staff/returns" },
+  { name: "Messages", icon: MessageSquare, path: "/staff/messages" },
 ];
 
 interface StaffSidebarProps {
@@ -47,7 +49,7 @@ export default function StaffSidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col bg-sidebar transition-transform duration-300 ease-in-out ${
+      className={`fixed left-0 top-0 z-50 flex h-dvh flex-col bg-sidebar transition-transform duration-300 ease-in-out ${
         isMobile
           ? `w-[280px] max-w-[85vw] ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`
           : `${collapsed ? "w-[72px]" : "w-[240px]"} translate-x-0`

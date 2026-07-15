@@ -31,6 +31,33 @@ export const users: User[] = [
     title: "Sales Staff",
     avatar: "https://i.pravatar.cc/40?img=12",
   },
+  {
+    id: "3",
+    email: "sara@ninamart.com",
+    password: "staff123",
+    role: "staff",
+    name: "Sara Ali",
+    title: "Sales Staff",
+    avatar: "https://i.pravatar.cc/40?img=5",
+  },
+  {
+    id: "4",
+    email: "omar@ninamart.com",
+    password: "staff123",
+    role: "staff",
+    name: "Omar Khalid",
+    title: "Sales Staff",
+    avatar: "https://i.pravatar.cc/40?img=33",
+  },
+  {
+    id: "5",
+    email: "fatima@ninamart.com",
+    password: "staff123",
+    role: "staff",
+    name: "Fatima Noor",
+    title: "Cashier",
+    avatar: "https://i.pravatar.cc/40?img=9",
+  },
 ];
 
 export function authenticate(

@@ -26,6 +26,11 @@ import {
   printInvoice,
   type InvoiceData,
 } from "../../utils/printInvoice";
+import {
+  pushAdminNotif,
+  broadcastStaffNotif,
+  LOW_STOCK_THRESHOLD,
+} from "../../utils/notificationStorage";
 
 interface HeldSale {
   id: string;
@@ -188,6 +193,39 @@ export default function PosDashboard() {
     printInvoice(invoice);
     resetSaleForm();
     setCartOpen(false);
+
+    // ── Notify Admin of new sale ──────────────────────────────────────────
+    const itemsSummaryShort = cart
+      .slice(0, 2)
+      .map((i) => `${i.name} x${i.quantity}`)
+      .join(", ") + (cart.length > 2 ? ` +${cart.length - 2} more` : "");
+
+    pushAdminNotif({
+      type: "order",
+      title: `New sale by ${user?.name ?? "Staff"}`,
+      message: `${invoice.invoiceNo} · ${itemsSummaryShort} · Total: ${formatCurrency(invoice.total)} (${invoice.paymentMethod})`,
+    });
+
+    // ── Check for low stock after sale and broadcast to all staff ─────────
+    cart.forEach((soldItem) => {
+      const product = products.find((p) => p.id === soldItem.id);
+      if (!product) return;
+      const remainingStock = product.stock - soldItem.quantity;
+      if (remainingStock <= LOW_STOCK_THRESHOLD && remainingStock >= 0) {
+        // Alert Admin
+        pushAdminNotif({
+          type: "stock",
+          title: `Low stock: ${product.name}`,
+          message: `After sale by ${user?.name ?? "Staff"}, only ${remainingStock} unit${remainingStock !== 1 ? "s" : ""} of ${product.name} remain. Please restock soon.`,
+        });
+        // Alert All Staff
+        broadcastStaffNotif({
+          type: "stock",
+          title: `Low stock alert: ${product.name}`,
+          message: `${product.name} is now at ${remainingStock} unit${remainingStock !== 1 ? "s" : ""}. Inform customers of possible delays.`,
+        });
+      }
+    });
   }, [
     cart,
     customerName,

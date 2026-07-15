@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Bell,
   ShoppingBag,
@@ -7,17 +7,21 @@ import {
   Info,
   CheckCheck,
   Users,
+  Trash2,
 } from "lucide-react";
 import AdminPageShell from "../../components/admin/AdminPageShell";
-import {
-  adminNotifications,
-  adminNotificationFilters,
-  type AdminNotificationFilter,
-  type AdminNotificationType,
-} from "../../data/adminNotificationsData";
 import { adminRoutes } from "../../data/adminRoutes";
+import {
+  getAdminNotifs,
+  markAdminNotifRead,
+  markAllAdminNotifsRead,
+  deleteAdminNotif,
+  formatNotifTime,
+  type AdminNotif,
+  type AdminNotifType,
+} from "../../utils/notificationStorage";
 
-const typeIcons: Record<AdminNotificationType, typeof Bell> = {
+const typeIcons: Record<AdminNotifType, typeof Bell> = {
   order: ShoppingBag,
   stock: Package,
   return: RotateCcw,
@@ -25,7 +29,7 @@ const typeIcons: Record<AdminNotificationType, typeof Bell> = {
   staff: Users,
 };
 
-const typeColors: Record<AdminNotificationType, string> = {
+const typeColors: Record<AdminNotifType, string> = {
   order: "bg-blue-100 text-blue-600",
   stock: "bg-orange-100 text-orange-600",
   return: "bg-purple-100 text-purple-600",
@@ -33,7 +37,18 @@ const typeColors: Record<AdminNotificationType, string> = {
   staff: "bg-teal-100 text-teal-600",
 };
 
-const filterTypeMap: Partial<Record<AdminNotificationFilter, AdminNotificationType>> = {
+const typeLabels: Record<AdminNotifType, string> = {
+  order: "Sale",
+  stock: "Stock",
+  return: "Return",
+  system: "System",
+  staff: "Staff",
+};
+
+const FILTERS = ["All", "Unread", "Orders", "Stock", "Returns", "Staff", "System"] as const;
+type Filter = (typeof FILTERS)[number];
+
+const filterTypeMap: Partial<Record<Filter, AdminNotifType>> = {
   Orders: "order",
   Stock: "stock",
   Returns: "return",
@@ -42,9 +57,14 @@ const filterTypeMap: Partial<Record<AdminNotificationFilter, AdminNotificationTy
 };
 
 export default function AdminNotifications() {
+  const [notifications, setNotifications] = useState<AdminNotif[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<AdminNotificationFilter>("All");
-  const [notifications, setNotifications] = useState(adminNotifications);
+  const [activeFilter, setActiveFilter] = useState<Filter>("All");
+
+  // Load from storage on mount
+  useEffect(() => {
+    setNotifications(getAdminNotifs());
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -63,14 +83,17 @@ export default function AdminNotifications() {
     });
   }, [notifications, searchQuery, activeFilter]);
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+  const handleMarkRead = (id: string) => {
+    setNotifications(markAdminNotifRead(id));
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const handleMarkAllRead = () => {
+    setNotifications(markAllAdminNotifsRead());
+  };
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setNotifications(deleteAdminNotif(id));
   };
 
   return (
@@ -80,7 +103,7 @@ export default function AdminNotifications() {
       action={
         unreadCount > 0 ? (
           <button
-            onClick={markAllAsRead}
+            onClick={handleMarkAllRead}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 sm:text-sm"
           >
             <CheckCheck className="h-4 w-4" />
@@ -89,6 +112,7 @@ export default function AdminNotifications() {
         ) : undefined
       }
     >
+      {/* Search */}
       <div className="mb-4">
         <input
           type="text"
@@ -99,14 +123,15 @@ export default function AdminNotifications() {
         />
       </div>
 
+      {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {adminNotificationFilters.map((filter) => (
+        {FILTERS.map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
             className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
               activeFilter === filter
-                ? "bg-indigo-600 text-white"
+                ? "bg-indigo-600 text-white shadow-sm"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
@@ -120,6 +145,7 @@ export default function AdminNotifications() {
         ))}
       </div>
 
+      {/* Notification List */}
       <div className="space-y-2">
         {filteredNotifications.length === 0 ? (
           <div className="rounded-xl border border-slate-100 bg-white p-8 text-center shadow-sm">
@@ -130,14 +156,13 @@ export default function AdminNotifications() {
           filteredNotifications.map((notification) => {
             const Icon = typeIcons[notification.type];
             return (
-              <button
+              <div
                 key={notification.id}
-                type="button"
-                onClick={() => markAsRead(notification.id)}
-                className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left shadow-sm transition hover:shadow-md ${
+                onClick={() => handleMarkRead(notification.id)}
+                className={`group flex w-full cursor-pointer items-start gap-3 rounded-xl border p-4 text-left shadow-sm transition hover:shadow-md ${
                   notification.read
                     ? "border-slate-100 bg-white"
-                    : "border-indigo-100 bg-indigo-50/30"
+                    : "border-indigo-100 bg-indigo-50/40"
                 }`}
               >
                 <div
@@ -147,15 +172,33 @@ export default function AdminNotifications() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-slate-800">{notification.title}</p>
-                    {!notification.read && (
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-600" />
-                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={`font-semibold ${notification.read ? "text-slate-700" : "text-slate-900"}`}>
+                        {notification.title}
+                      </p>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeColors[notification.type]}`}>
+                        {typeLabels[notification.type]}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {!notification.read && (
+                        <span className="h-2 w-2 rounded-full bg-indigo-600" />
+                      )}
+                      <button
+                        onClick={(e) => handleDelete(e, notification.id)}
+                        className="rounded-lg p-1 text-slate-300 opacity-0 transition hover:bg-slate-100 hover:text-red-500 group-hover:opacity-100"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                   <p className="mt-0.5 text-sm text-slate-500">{notification.message}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">{notification.time}</p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    {formatNotifTime(notification.time)}
+                  </p>
                 </div>
-              </button>
+              </div>
             );
           })
         )}
