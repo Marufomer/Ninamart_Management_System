@@ -181,3 +181,14 @@ export const TODAY_SALES = 241500;
 export function formatCurrency(amount: number): string {
   return `Br ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+export function getInventoryData() {
+  const inStock = products.filter(p => p.stock > 5).length;
+  const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5).length;
+  const outOfStock = products.filter(p => p.stock === 0).length;
+  return [
+    { name: "In Stock", value: inStock, color: "#22c55e" },
+    { name: "Low Stock", value: lowStock, color: "#f59e0b" },
+    { name: "Out of Stock", value: outOfStock, color: "#ef4444" },
+  ];
+}

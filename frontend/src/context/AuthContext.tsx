@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from "react";
 import {
-  authenticate,
   findUserByEmail,
   getStoredPassword,
   setStoredPassword,

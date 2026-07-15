@@ -1,4 +1,6 @@
+import { Eye, Printer } from "lucide-react";
 import { todaysSales } from "../../data/mockData";
+import { printInvoice, previewInvoice, type InvoiceData } from "../../utils/printInvoice";
 
 const statusStyles: Record<string, string> = {
   Paid: "bg-emerald-100 text-emerald-700",
@@ -7,6 +9,47 @@ const statusStyles: Record<string, string> = {
 
 export default function TodaysSales() {
   const totalSales = "Br 82,450";
+
+  // Helper to map a dashboard todaySale to print-friendly InvoiceData
+  const buildInvoiceFromTodaySale = (sale: typeof todaysSales[0]): InvoiceData => {
+    const totalVal = parseFloat(sale.total.replace(/[^\d.]/g, ""));
+    const subtotal = Math.round(totalVal / 1.15); // Assume 15% VAT
+    const tax = totalVal - subtotal;
+
+    return {
+      invoiceNo: sale.invoice,
+      date: new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      time: sale.time,
+      staff: sale.staff,
+      customer: sale.customer,
+      items: [
+        {
+          name: sale.product,
+          quantity: sale.qty,
+          unitPrice: Math.round(subtotal / sale.qty),
+        },
+      ],
+      subtotal,
+      tax,
+      discount: 0,
+      total: totalVal,
+      paymentMethod: sale.status === "Paid" ? "Mobile Money" : "Cash",
+      amountPaid: totalVal,
+      change: 0,
+    };
+  };
+
+  const handlePrint = (sale: typeof todaysSales[0]) => {
+    printInvoice(buildInvoiceFromTodaySale(sale));
+  };
+
+  const handleView = (sale: typeof todaysSales[0]) => {
+    previewInvoice(buildInvoiceFromTodaySale(sale));
+  };
 
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-5">
@@ -39,6 +82,24 @@ export default function TodaysSales() {
               <span>{sale.time}</span>
               <span className="font-bold text-slate-800">{sale.total}</span>
             </div>
+            
+            {/* View/Print actions for mobile cards */}
+            <div className="mt-2 flex items-center gap-2 border-t border-slate-50 pt-2">
+              <button
+                onClick={() => handleView(sale)}
+                className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                View
+              </button>
+              <button
+                onClick={() => handlePrint(sale)}
+                className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                Print
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -48,7 +109,7 @@ export default function TodaysSales() {
         <table className="w-full min-w-[640px] text-left">
           <thead>
             <tr className="border-b border-slate-100">
-              {["Invoice", "Customer", "Product", "Qty", "Total", "Staff", "Time", "Status"].map(
+              {["Invoice", "Customer", "Product", "Qty", "Total", "Staff", "Time", "Status", "Action"].map(
                 (col) => (
                   <th
                     key={col}
@@ -85,12 +146,30 @@ export default function TodaysSales() {
                 <td className="whitespace-nowrap py-2.5 pr-2 text-xs text-slate-500">
                   {sale.time}
                 </td>
-                <td className="py-2.5">
+                <td className="py-2.5 pr-2">
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusStyles[sale.status]}`}
                   >
                     {sale.status}
                   </span>
+                </td>
+                <td className="py-2.5">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleView(sale)}
+                      className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-605 cursor-pointer"
+                      title="View Invoice"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handlePrint(sale)}
+                      className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-605 cursor-pointer"
+                      title="Print Invoice"
+                    >
+                      <Printer className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

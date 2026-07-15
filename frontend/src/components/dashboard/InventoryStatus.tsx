@@ -1,9 +1,9 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { inventoryData } from "../../data/mockData";
-
-const total = inventoryData.reduce((sum, item) => sum + item.value, 0);
+import { getInventoryData } from "../../data/posData";
 
 export default function InventoryStatus() {
+  const inventoryData = getInventoryData();
+  const total = inventoryData.reduce((sum, item) => sum + item.value, 0);
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-5">
       <h3 className="mb-3 text-sm font-semibold text-slate-800 sm:mb-4">

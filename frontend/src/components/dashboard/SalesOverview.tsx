@@ -12,8 +12,54 @@ import { salesChartData, salesOverviewStats } from "../../data/mockData";
 
 const timeRanges = ["Today", "Week", "Month", "Year"];
 
+const weeklySalesData = [
+  { time: "Mon", sales: 45000 },
+  { time: "Tue", sales: 52000 },
+  { time: "Wed", sales: 49000 },
+  { time: "Thu", sales: 63000 },
+  { time: "Fri", sales: 58000 },
+  { time: "Sat", sales: 74000 },
+  { time: "Sun", sales: 69000 },
+];
+
+const monthlySalesData = [
+  { time: "Week 1", sales: 180000 },
+  { time: "Week 2", sales: 220000 },
+  { time: "Week 3", sales: 210000 },
+  { time: "Week 4", sales: 245000 },
+];
+
+const yearlySalesData = [
+  { time: "Jan", sales: 540000 },
+  { time: "Feb", sales: 620000 },
+  { time: "Mar", sales: 710000 },
+  { time: "Apr", sales: 680500 },
+  { time: "May", sales: 840000 },
+  { time: "Jun", sales: 950000 },
+  { time: "Jul", sales: 890000 },
+  { time: "Aug", sales: 910000 },
+  { time: "Sep", sales: 870000 },
+  { time: "Oct", sales: 960000 },
+  { time: "Nov", sales: 1050000 },
+  { time: "Dec", sales: 1200000 },
+];
+
 export default function SalesOverview() {
   const [activeRange, setActiveRange] = useState("Today");
+
+  const getChartData = () => {
+    switch (activeRange) {
+      case "Week":
+        return weeklySalesData;
+      case "Month":
+        return monthlySalesData;
+      case "Year":
+        return yearlySalesData;
+      case "Today":
+      default:
+        return salesChartData;
+    }
+  };
 
   return (
     <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-5">
@@ -38,7 +84,7 @@ export default function SalesOverview() {
 
       <div className="h-[180px] sm:h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={salesChartData} margin={{ left: -10, right: 5 }}>
+          <AreaChart data={getChartData()} margin={{ left: -10, right: 5 }}>
             <defs>
               <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />

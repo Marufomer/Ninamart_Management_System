@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Package, AlertTriangle, Layers, Search } from "lucide-react";
 import StaffHeader from "../../components/staff/StaffHeader";
 import CategoryFilters from "../../components/staff/ProductGrid";

@@ -45,16 +45,6 @@ export const kpiCards = [
     iconBg: "bg-sky-100",
     iconColor: "text-sky-600",
   },
-  {
-    title: "Staff Working Today",
-    value: "18",
-    trend: "View Attendance",
-    trendUp: false,
-    isLink: true,
-    icon: "staff",
-    iconBg: "bg-teal-100",
-    iconColor: "text-teal-600",
-  },
 ];
 
 export const salesChartData = [
@@ -127,12 +117,12 @@ export const staffPerformance = [
 ];
 
 export const quickActions = [
-  { label: "Add Product", icon: "package", bg: "bg-purple-50", iconColor: "text-purple-600" },
-  { label: "Add Staff", icon: "userPlus", bg: "bg-blue-50", iconColor: "text-blue-600" },
-  { label: "New Sale", icon: "shoppingCart", bg: "bg-emerald-50", iconColor: "text-emerald-600" },
-  { label: "Purchase Order", icon: "clipboard", bg: "bg-orange-50", iconColor: "text-orange-600" },
-  { label: "Stock Adjustment", icon: "settings", bg: "bg-pink-50", iconColor: "text-pink-600" },
-  { label: "Generate Report", icon: "fileText", bg: "bg-indigo-50", iconColor: "text-indigo-600" },
+  { label: "Add Product", icon: "package", bg: "bg-purple-50", iconColor: "text-purple-600", path: "/dashboard/add-product" },
+  { label: "Add Staff", icon: "userPlus", bg: "bg-blue-50", iconColor: "text-blue-600", path: "/dashboard/staff" },
+  { label: "New Sale", icon: "shoppingCart", bg: "bg-emerald-50", iconColor: "text-emerald-600", path: "/dashboard/sales" },
+  { label: "Purchase Order", icon: "clipboard", bg: "bg-orange-50", iconColor: "text-orange-600", path: "/dashboard/inventory" },
+  { label: "Stock Adjustment", icon: "settings", bg: "bg-pink-50", iconColor: "text-pink-600", path: "/dashboard/inventory" },
+  { label: "Generate Report", icon: "fileText", bg: "bg-indigo-50", iconColor: "text-indigo-600", path: "/dashboard/daily-report" },
 ];
 
 export const todaysSummary = [
@@ -147,49 +137,44 @@ export const navGroups = [
   {
     label: "Product Management",
     items: [
-      { name: "Products", icon: "package" },
-      { name: "Categories", icon: "grid" },
-      { name: "Brands", icon: "tag" },
-      { name: "Inventory", icon: "warehouse" },
-      { name: "Suppliers", icon: "truck" },
+      { name: "Products", icon: "package", path: "/dashboard/products" },
+      { name: "Categories", icon: "grid", path: "/dashboard/categories" },
+      { name: "Inventory", icon: "warehouse", path: "/dashboard/inventory" },
+      { name: "Add Product", icon: "plus", path: "/dashboard/add-product" },
     ],
   },
   {
     label: "Sales Management",
     items: [
-      { name: "Sales", icon: "shoppingCart" },
-      { name: "Orders", icon: "clipboardList" },
-      { name: "Returns", icon: "rotateCcw" },
-      { name: "Customers", icon: "users" },
-      { name: "Discounts", icon: "percent" },
+      { name: "Sales", icon: "shoppingCart", path: "/dashboard/sales" },
+      { name: "Returns", icon: "rotateCcw", path: "/dashboard/returns" },
+      { name: "Discounts", icon: "percent", path: "/dashboard/discounts" },
     ],
   },
   {
     label: "Staff Management",
     items: [
-      { name: "Staff", icon: "userCheck" },
-      { name: "Attendance", icon: "calendar" },
-      { name: "Performance", icon: "trendingUp" },
-      { name: "Roles & Permissions", icon: "shield" },
+      { name: "Staff", icon: "userCheck", path: "/dashboard/staff" },
+      { name: "Roles & Permissions", icon: "shield", path: "/dashboard/roles" },
     ],
   },
   {
     label: "Reports",
     items: [
-      { name: "Daily Report", icon: "fileText" },
-      { name: "Monthly Report", icon: "barChart" },
-      { name: "Best Selling Products", icon: "star" },
-      { name: "Revenue Analytics", icon: "pieChart" },
+      { name: "Daily Report", icon: "fileText", path: "/dashboard/daily-report" },
+      { name: "Monthly Report", icon: "barChart", path: "/dashboard/monthly-report" },
+      { name: "Best Selling Products", icon: "star", path: "/dashboard/best-selling" },
+      { name: "Revenue Analytics", icon: "pieChart", path: "/dashboard/revenue-analytics" },
     ],
   },
   {
     label: "Settings",
     items: [
-      { name: "Store Settings", icon: "store" },
-      { name: "User Accounts", icon: "userCog" },
-      { name: "Activity Logs", icon: "activity" },
-      { name: "Backup", icon: "database" },
-      { name: "Notifications", icon: "bell" },
+      { name: "Store Settings", icon: "store", path: "/dashboard/store-settings" },
+      { name: "User Accounts", icon: "userCog", path: "/dashboard/user-accounts" },
+      { name: "Activity Logs", icon: "activity", path: "/dashboard/activity-logs" },
+      { name: "Backup", icon: "database", path: "/dashboard/backup" },
+      { name: "Notifications", icon: "bell", path: "/dashboard/notifications" },
     ],
   },
 ];
